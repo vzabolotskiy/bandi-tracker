@@ -51,9 +51,13 @@ a { color: var(--accent); }
 header.top { padding: 40px 0 28px; }
 .brand { font-weight: 700; font-size: 15px; color: var(--muted); margin: 0 0 18px; }
 .brand b { color: var(--accent); }
+.brand a { font-weight: 600; }
 h1.headline { font-size: clamp(30px, 4.6vw, 52px); line-height: 1.05; font-weight: 700; margin: 0; max-width: 18ch; letter-spacing: -0.01em; }
 h1.headline .count { font-variant-numeric: tabular-nums; }
 .subline { color: var(--muted); margin: 12px 0 0; max-width: 62ch; }
+.caution { margin: 16px 0 0; max-width: 72ch; font-size: 14px; padding: 10px 14px; border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 6px 6px 0; }
+.caution strong { color: var(--ink); }
+.hint.warn { color: var(--flag); }
 
 .layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 64px; }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
@@ -106,6 +110,15 @@ details.more[open] summary::after { content: " –"; }
 .chip .n { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: 4px; font-weight: 400; }
 select.area { flex: 1 1 240px; min-width: 0; max-width: 440px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); font-size: 14px; max-width: 100%; }
 .resultline { font-size: 14px; color: var(--muted); }
+.feed { font-size: 14px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.feed a { font-weight: 600; }
+.feed button { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; font-size: 14px; text-decoration: underline; }
+.side { display: grid; gap: 8px; justify-items: end; align-content: start; }
+.star { border: 1px solid var(--rule); background: var(--surface); border-radius: 6px; padding: 2px 8px; font-size: 13px; cursor: pointer; color: var(--muted); white-space: nowrap; }
+.star[aria-pressed=true] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.star .ico { font-size: 14px; margin-right: 4px; }
+li.call.is-closed { opacity: .7; }
+.verdict.closed { color: var(--muted); background: var(--bg); }
 
 /* Calls */
 ol.calls { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
@@ -121,12 +134,17 @@ li.call.is-no { opacity: .62; }
 .main { min-width: 0; }
 main { min-width: 0; }
 .kind { font-size: 13px; font-weight: 600; color: var(--accent); }
+.kind-link { color: inherit; text-decoration: none; }
+.kind-link:hover { text-decoration: underline; }
 .new { font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 0 6px; margin-left: 6px; }
 .title { font-size: 17px; font-weight: 600; line-height: 1.3; margin: 2px 0 4px; overflow-wrap: anywhere; }
 .title a { color: inherit; text-decoration: none; }
 .title a:hover { text-decoration: underline; }
 .where { font-size: 14px; color: var(--muted); }
 .gsd { font-size: 14px; }
+.gsd .area-name { color: var(--muted); white-space: nowrap; }
+.gsd .area-name::after { content: "\00a0›"; color: var(--muted); margin-right: 6px; }
+@media (max-width: 560px) { .gsd .area-name { white-space: normal; } }
 .gsd code { font: 600 13px "Titillium Web", sans-serif; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; }
 .verdict { font-size: 13px; font-weight: 600; border-radius: 6px; padding: 3px 8px; white-space: nowrap; align-self: start; }
 .verdict.yes { color: var(--yes); background: var(--yes-soft); }
@@ -147,11 +165,13 @@ details.more-info dd { margin: 0; }
 @media (max-width: 560px) {
   .wrap { padding: 0 16px; }
   li.call { grid-template-columns: 56px minmax(0, 1fr); }
-  .verdict { grid-column: 2; justify-self: start; }
+  .side { grid-column: 2; justify-items: start; grid-auto-flow: column; justify-content: start; align-items: center; }
   .due .d { font-size: 28px; }
 }
 .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
 .more-btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--rule); border-top: 0; background: var(--surface); cursor: pointer; border-radius: 0 0 10px 10px; color: var(--accent); font-weight: 600; }
+.more-btn:disabled { color: var(--muted); background: var(--bg); cursor: default; font-weight: 400; }
+ol.calls:has(+ .more-btn) { border-radius: 10px 10px 0 0; }
 footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80ch; }
 @media (prefers-reduced-motion: no-preference) {
   .count { transition: color .3s; }
@@ -161,9 +181,10 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
 <body>
 <div class="wrap">
   <header class="top">
-    <p class="brand"><b>Bandi tracker</b>, open research calls in Italy</p>
+    <p class="brand"><b>Bandi tracker</b>, open research calls in Italy. <a href="faq.html">Position types explained</a></p>
     <h1 class="headline" id="headline">Loading open calls…</h1>
     <p class="subline" id="subline"></p>
+    <p class="caution"><strong>Use this as a starting point, not a verdict.</strong> The data is scraped automatically and the eligibility rules are a simplified reading of the law, so both can be wrong or out of date. Calls can add their own requirements. Always read the call itself before applying or ruling one out.</p>
   </header>
 
   <div class="layout">
@@ -195,6 +216,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
             <label for="m-rtd">RTDa or RTDb</label><input id="m-rtd" type="number" min="0" max="200" name="m.rtd" placeholder="0">
           </div>
           <p class="hint" style="margin-top:8px">Assegni, borse di ricerca and posts abroad don't count here.</p>
+          <p class="hint warn">Treat these limits with caution: how past contracts count toward the caps is still unsettled, and universities may read the rules differently. If a call is marked not eligible because of time served, check with the university.</p>
           <label class="field"><span>Permanent post at an Italian university or research body</span>
             <select name="permanent"><option value="no">No</option><option value="current">Yes, currently</option><option value="former">Previously, as professor or researcher</option></select></label>
           <label class="field"><span>Citizenship</span>
@@ -223,6 +245,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
           <div class="seg" role="group" aria-label="Which calls to show" id="show">
             <button type="button" data-v="can" aria-pressed="true">Calls I can apply for</button>
             <button type="button" data-v="all" aria-pressed="false">All open calls</button>
+            <button type="button" data-v="saved" aria-pressed="false" id="savedBtn">Saved</button>
           </div>
           <div class="seg" role="group" aria-label="Sort" id="sort">
             <button type="button" data-v="deadline" aria-pressed="true">Closing soon</button>
@@ -230,14 +253,15 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
           </div>
         </div>
         <div class="resultline" id="resultline" aria-live="polite"></div>
+        <div class="feed" id="feed"></div>
       </div>
       <ol class="calls" id="calls"></ol>
-      <button class="more-btn" id="more" hidden>Show more</button>
+      <button class="more-btn" id="more" type="button">Show more</button>
     </main>
   </div>
 
   <footer>
-    Data from <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, refreshed daily. Eligibility follows the national rules (L. 240/2010 as amended by DL 36/2022 and DL 45/2025); individual calls can add requirements, so always read the call itself. Kinship exclusions are not checked.
+    Data from <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, refreshed daily. Eligibility follows the national rules (L. 240/2010 as amended by DL 36/2022 and DL 45/2025); individual calls can add requirements, so always read the call itself. Kinship exclusions are not checked. <a href="faq.html">What the position types mean</a>.
   </footer>
 </div>
 
@@ -253,6 +277,12 @@ const AREAS = {
 };
 const TYPE_ORDER = ["incarico_ricerca", "incarico_postdoc", "contratto_ricerca", "rtt", "rtd_a", "prof_associato", "prof_ordinario", "tecnologo"];
 const PAGE = 60;
+const FAQ_ANCHOR = { incarico_ricerca: "incarico-ricerca", incarico_postdoc: "incarico-postdoc", contratto_ricerca: "contratto-ricerca", rtt: "rtt", rtd_a: "rtda", rtd_b: "rtdb", rtd_pnrr: "rtda", prof_associato: "associato", prof_ordinario: "ordinario", tecnologo: "tecnologo" };
+const FEED_GROUP = {
+  incarico_ricerca: "incarichi", incarico_postdoc: "postdoc", contratto_ricerca: "contratti",
+  rtt: "rtt", rtd_a: "rtt", rtd_b: "rtt", rtd_pnrr: "rtt", prof_associato: "prof", prof_ordinario: "prof", tecnologo: "tecno",
+};
+const FEED_GROUP_NAMES = { incarichi: "incarichi di ricerca", postdoc: "incarichi post-doc", contratti: "contratti di ricerca", rtt: "RTT and RTD posts", prof: "professor posts", tecno: "tecnologo posts" };
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("bt:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
@@ -271,6 +301,14 @@ let state = {
 };
 let profile = store.get("profile", {});
 const lastVisit = store.get("lastVisit", null);
+let saved = store.get("saved", {}); // id -> snapshot of the call, kept after it closes
+const SNAP = ["id", "type", "title", "title_en", "institution", "city", "area", "gsd", "gsd_label", "deadline", "url", "call_url"];
+function toggleSaved(id) {
+  if (saved[id]) delete saved[id];
+  else { const c = calls.find((x) => x.id === id); if (!c) return; saved[id] = Object.fromEntries(SNAP.filter((k) => c[k] != null).map((k) => [k, c[k]])); }
+  store.set("saved", saved);
+  render();
+}
 
 /* ---------- profile form ---------- */
 const form = $("#profile");
@@ -361,8 +399,14 @@ function render() {
   $("#types").innerHTML = TYPE_ORDER.filter((t) => typeCounts[t] || state.types.includes(t)).map((t) =>
     `<button type="button" class="chip" data-t="${t}" aria-pressed="${state.types.includes(t)}" title="${esc(TYPE_HINTS[t] || "")}">${esc(TYPE_LABELS[t])}<span class="n">${typeCounts[t] || 0}</span></button>`).join("");
 
-  let list = inScope.filter((c) => !state.types.length || state.types.includes(c.type));
-  if (!empty && state.show === "can") list = list.filter((c) => c._v.status !== "no");
+  let list;
+  if (state.show === "saved") {
+    const byId = Object.fromEntries(calls.map((c) => [c.id, c]));
+    list = Object.keys(saved).map((id) => byId[id] || { ...saved[id], _closed: true, _v: { status: "closed", reasons: [], flags: [], notes: [] } });
+  } else {
+    list = inScope.filter((c) => !state.types.length || state.types.includes(c.type));
+    if (!empty && state.show === "can") list = list.filter((c) => c._v.status !== "no");
+  }
   list.sort(state.sort === "new"
     ? (a, b) => (b.first_seen || "").localeCompare(a.first_seen || "") || (a.deadline || "").localeCompare(b.deadline || "")
     : (a, b) => (a.deadline || "").localeCompare(b.deadline || ""));
@@ -376,18 +420,45 @@ function render() {
     : `Across all fields and position types, under national rules. Updated ${fmtDate(updated)}.`;
 
   const newCount = lastVisit ? list.filter((c) => c.first_seen > lastVisit).length : 0;
-  $("#resultline").textContent = `${list.length} call${list.length === 1 ? "" : "s"} shown` + (newCount ? `, ${newCount} new since your last visit` : "");
+  $("#resultline").textContent = state.show === "saved"
+    ? (list.length ? `${list.length} saved call${list.length === 1 ? "" : "s"}. Saved calls live in this browser only.` : "")
+    : `${list.length} call${list.length === 1 ? "" : "s"} shown` + (newCount ? `, ${newCount} new since your last visit` : "");
+  $("#savedBtn").textContent = Object.keys(saved).length ? `Saved (${Object.keys(saved).length})` : "Saved";
+  renderFeed();
 
   const shown = list.slice(0, state.limit);
   $("#calls").innerHTML = shown.length ? shown.map(row).join("") :
-    `<li class="empty">${empty || state.show === "all" ? "No open calls match these filters. Try another field or clear the search." : "None of the calls matching these filters fit your profile. Switch to all open calls to see why."}</li>`;
-  $("#more").hidden = list.length <= state.limit;
-  $("#more").textContent = `Show ${Math.min(PAGE, list.length - state.limit)} more`;
+    `<li class="empty">${state.show === "saved" ? "No saved calls yet. Use Save on any call to keep it here, even after it closes." : empty || state.show === "all" ? "No open calls match these filters. Try another field or clear the search." : "None of the calls matching these filters fit your profile. Switch to all open calls to see why."}</li>`;
+  const remaining = list.length - state.limit;
+  $("#more").disabled = remaining <= 0;
+  $("#more").textContent = remaining > 0 ? `Show ${Math.min(PAGE, remaining)} more of ${remaining}` : list.length ? `All ${list.length} shown` : "Nothing to show";
 }
+
+function renderFeed() {
+  const el = $("#feed");
+  if (state.show === "saved") { el.innerHTML = ""; return; }
+  const area = state.area ? state.area.slice(0, 2) : "";
+  const groups = [...new Set(state.types.map((t) => FEED_GROUP[t]).filter(Boolean))];
+  const g = groups.length === 1 ? groups[0] : "";
+  const file = area && g ? `${area}-${g}.xml` : area ? `area-${area}.xml` : g ? `type-${g}.xml` : "all.xml";
+  const what = [g ? FEED_GROUP_NAMES[g] : "calls", area ? "in " + AREAS[area].toLowerCase() : ""].filter(Boolean).join(" ");
+  const url = new URL("data/feeds/" + file, location.href).href;
+  const note = groups.length > 1 ? " Pick a single position type for a narrower feed." : state.area.length > 2 ? " Feeds cover whole fields, not single sectors." : "";
+  el.innerHTML = `<span>Follow new ${esc(what)}:</span><a href="${esc(url)}" target="_blank" rel="noopener">RSS feed</a><button type="button" id="copyFeed" data-url="${esc(url)}">Copy link</button><span>Paste it into a feed reader, or into an RSS-to-email service to get it by email.${note}</span>`;
+}
+$("#feed").addEventListener("click", async (e) => {
+  const b = e.target.closest("#copyFeed"); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.url); b.textContent = "Link copied"; }
+  catch { prompt("Copy this feed link:", b.dataset.url); }
+  setTimeout(() => { b.textContent = "Copy link"; }, 2000);
+});
+$("#calls").addEventListener("click", (e) => {
+  const b = e.target.closest(".star"); if (b) toggleSaved(b.dataset.id);
+});
 
 function row(c) {
   const v = c._v, dl = daysLeft(c.deadline);
-  const vLabel = { yes: "You can apply", flag: "You can apply, see notes", no: "Not eligible" }[v.status];
+  const vLabel = { yes: "You can apply", flag: "You can apply, see notes", no: "Not eligible", closed: "Closed" }[v.status];
   const isNew = lastVisit && c.first_seen > lastVisit;
   const title = c.title_en && c.title_en.toLowerCase() !== (c.title || "").toLowerCase() ? c.title_en : c.title;
   const items = [
@@ -405,16 +476,16 @@ function row(c) {
     ["Sector", c.ssd],
     ["Published", fmtDate(c.published)],
   ].filter(([, x]) => x);
-  return `<li class="call ${v.status === "no" ? "is-no" : ""}">
-    <div class="due ${dl <= 7 ? "urgent" : ""}" aria-label="${dl === 0 ? "Closes today" : `Closes in ${dl} days`}">
-      ${dl === 0 ? `<div class="d today">Today</div><div class="u">last day</div>` : `<div class="d">${dl}</div><div class="u">${dl === 1 ? "day left" : "days left"}</div>`}
+  return `<li class="call ${v.status === "no" ? "is-no" : ""} ${c._closed ? "is-closed" : ""}">
+    <div class="due ${dl >= 0 && dl <= 7 ? "urgent" : ""}" aria-label="${dl < 0 ? "Closed" : dl === 0 ? "Closes today" : `Closes in ${dl} days`}">
+      ${dl < 0 ? `<div class="d today">Closed</div>` : dl === 0 ? `<div class="d today">Today</div><div class="u">last day</div>` : `<div class="d">${dl}</div><div class="u">${dl === 1 ? "day left" : "days left"}</div>`}
       <div class="date">${fmtDate(c.deadline)}</div>
     </div>
     <div class="main">
-      <div class="kind">${esc(TYPE_LABELS[c.type] || c.type)}${isNew ? '<span class="new">New</span>' : ""}</div>
+      <div class="kind">${FAQ_ANCHOR[c.type] ? `<a class="kind-link" href="faq.html#${FAQ_ANCHOR[c.type]}" title="What is this position?">${esc(TYPE_LABELS[c.type])}</a>` : esc(TYPE_LABELS[c.type] || c.type)}${isNew ? '<span class="new">New</span>' : ""}</div>
       <div class="title"><a href="${esc(c.call_url || c.url)}" target="_blank" rel="noopener">${esc(title)}</a></div>
       <div class="where">${esc(c.institution || "")}${c.city ? ", " + esc(titleCase(c.city)) : ""}</div>
-      ${c.gsd ? `<div class="gsd"><code>${esc(c.gsd)}</code> ${esc(sentence(c.gsd_label || ""))}</div>` : ""}
+      ${c.area || c.gsd ? `<div class="gsd">${AREAS[c.area] ? `<span class="area-name">${esc(AREAS[c.area])}</span>` : ""}${c.gsd ? `<span class="spec"><code>${esc(c.gsd)}</code> ${esc(sentence(c.gsd_label || ""))}</span>` : ""}</div>` : ""}
       ${items ? `<ul class="notes">${items}</ul>` : ""}
       <details class="more-info"><summary>Details</summary>
         ${c.summary_en || c.summary_it ? `<p>${esc(c.summary_en || c.summary_it)}</p>` : ""}
@@ -426,7 +497,10 @@ function row(c) {
         </div>
       </details>
     </div>
-    ${v.status !== "unknown" ? `<div class="verdict ${v.status}">${vLabel}</div>` : "<div></div>"}
+    <div class="side">
+      ${v.status !== "unknown" ? `<div class="verdict ${v.status}">${vLabel}</div>` : ""}
+      <button type="button" class="star" data-id="${esc(c.id)}" aria-pressed="${!!saved[c.id]}"><span class="ico" aria-hidden="true">${saved[c.id] ? "★" : "☆"}</span>${saved[c.id] ? "Saved" : "Save"}</button>
+    </div>
   </li>`;
 }
 

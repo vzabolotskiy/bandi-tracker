@@ -29,6 +29,11 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+try:
+    from .feeds import write_feeds
+except ImportError:  # run as a script
+    from feeds import write_feeds
+
 BASE = "https://bandi.mur.gov.it"
 UA = "bandi-tracker/0.1 (personal research tool; polite: 1 req/s)"
 DELAY_S = 1.0
@@ -346,6 +351,7 @@ def export_open(db: dict, path: Path) -> None:
         rows.append({k: v for k, v in r.items() if v not in (None, "", [])})
     rows.sort(key=lambda r: r.get("deadline") or "9999")
     path.write_text(json.dumps({"updated": db["updated"], "calls": rows}, ensure_ascii=False, separators=(",", ":")))
+    write_feeds(rows, path.parent / "feeds")
 
 
 def main(argv=None):

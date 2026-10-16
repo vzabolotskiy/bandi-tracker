@@ -35,6 +35,8 @@ Doctoral calls (`doctorate.php`) are not scraped.
 - `index.html` loads `data/open.json` (open calls only, written by the scraper after each run).
 - `assets/eligibility.js` encodes the national eligibility rules per position type; tests in `tests/eligibility.test.mjs` (`node --test tests/eligibility.test.mjs`).
 - The visitor's profile and filters are stored in their browser only.
+- Saved calls are also browser-only; a snapshot is kept so they still show after closing.
+- RSS feeds of calls first seen in the last 30 days are written to `data/feeds/` on every run (`scraper/feeds.py`): `all.xml`, `area-13.xml`, `type-rtt.xml`, `13-rtt.xml`, etc.
 
 ## Run locally
 

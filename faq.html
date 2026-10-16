@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Position types explained</title>
+<meta name="description" content="Short explanations of Italian academic and research position types: incarichi, contratti di ricerca, RTT, professors, tecnologi, and legacy posts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F6F8; --surface: #FFFFFF; --ink: #17222E; --muted: #5A6675; --rule: #DCE2E8;
+  --accent: #4E3596; --accent-soft: #ECE7F7; --flag: #94590A; --flag-soft: #FBF0DC; --focus: #4E3596;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161C; --surface: #182029; --ink: #E6EBF0; --muted: #98A4B0; --rule: #29333E;
+    --accent: #A993EA; --accent-soft: #2A2342; --flag: #E3A845; --flag-soft: #33270F; --focus: #A993EA;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161C; --surface: #182029; --ink: #E6EBF0; --muted: #98A4B0; --rule: #29333E;
+  --accent: #A993EA; --accent-soft: #2A2342; --flag: #E3A845; --flag-soft: #33270F; --focus: #A993EA;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 "Titillium Web", system-ui, sans-serif; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 560px) { .wrap { padding: 0 16px; } }
+header.top { padding: 40px 0 24px; }
+.brand { font-weight: 700; font-size: 15px; color: var(--muted); margin: 0 0 18px; }
+.brand a { color: var(--accent); text-decoration: none; }
+.brand a:hover { text-decoration: underline; }
+h1 { font-size: clamp(30px, 4.6vw, 48px); line-height: 1.08; margin: 0; max-width: 20ch; letter-spacing: -0.01em; }
+.lede { color: var(--muted); max-width: 64ch; margin: 12px 0 0; }
+.caution { margin: 16px 0 0; max-width: 72ch; font-size: 14px; padding: 10px 14px; border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 6px 6px 0; }
+
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; align-items: start; padding-bottom: 64px; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; gap: 16px; } }
+nav.toc { position: sticky; top: 16px; font-size: 15px; }
+@media (max-width: 860px) { nav.toc { position: static; } }
+nav.toc p { font-weight: 700; margin: 0 0 6px; }
+nav.toc ul { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 2px; }
+nav.toc a { text-decoration: none; color: var(--muted); }
+nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+
+section { margin-bottom: 40px; }
+h2 { font-size: 26px; margin: 0 0 6px; }
+.section-lede { color: var(--muted); margin: 0 0 16px; max-width: 66ch; }
+.ladder { font-size: 15px; margin: 0 0 18px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
+.ladder ol { margin: 6px 0 0; padding-left: 22px; display: grid; gap: 2px; }
+.ladder ol li::marker { color: var(--accent); font-weight: 700; }
+
+.types { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+article.type { padding: 20px 22px; border-top: 1px solid var(--rule); scroll-margin-top: 16px; }
+article.type:first-child { border-top: 0; }
+article.type h3 { font-size: 20px; margin: 0; line-height: 1.25; }
+article.type h3 .en { font-weight: 400; color: var(--muted); font-size: 16px; margin-left: 6px; }
+article.type .what { margin: 6px 0 12px; max-width: 70ch; }
+dl.facts { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 18px; margin: 0; font-size: 15px; }
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; max-width: 62ch; }
+@media (max-width: 560px) { dl.facts { grid-template-columns: 1fr; gap: 0; } dl.facts dd { margin-bottom: 8px; } }
+.legacy article.type h3 { color: var(--muted); }
+
+.terms { display: grid; gap: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+details.term { border-top: 1px solid var(--rule); padding: 0 22px; }
+details.term:first-child { border-top: 0; }
+details.term summary { cursor: pointer; padding: 14px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+details.term summary::-webkit-details-marker { display: none; }
+details.term summary::after { content: "+"; color: var(--muted); font-weight: 400; }
+details.term[open] summary::after { content: "–"; }
+details.term p { margin: 0 0 14px; max-width: 70ch; }
+footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="brand"><a href="./">Bandi tracker</a>, open research calls in Italy</p>
+    <h1>Italian research positions, explained</h1>
+    <p class="lede">What each position type on bandi.mur.gov.it is, who can apply, and how long it lasts. Rules as of October 2026, after the 2022 and 2025 reforms.</p>
+    <p class="caution">These are simplified summaries of national law. Universities apply them through their own regulations, and each call can add requirements. Read the call before applying.</p>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="On this page">
+      <p>Current positions</p>
+      <ul>
+        <li><a href="#incarico-ricerca">Incarico di ricerca</a></li>
+        <li><a href="#incarico-postdoc">Incarico post-doc</a></li>
+        <li><a href="#contratto-ricerca">Contratto di ricerca</a></li>
+        <li><a href="#rtt">RTT</a></li>
+        <li><a href="#associato">Professore associato</a></li>
+        <li><a href="#ordinario">Professore ordinario</a></li>
+        <li><a href="#tecnologo">Tecnologo</a></li>
+      </ul>
+      <p>Legacy positions</p>
+      <ul>
+        <li><a href="#assegno">Assegno di ricerca</a></li>
+        <li><a href="#rtda">RTDa</a></li>
+        <li><a href="#rtdb">RTDb</a></li>
+      </ul>
+      <p>Other questions</p>
+      <ul>
+        <li><a href="#terms">Terms and rules</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <section aria-labelledby="current">
+        <h2 id="current">Current positions</h2>
+        <p class="section-lede">Since 2022 the path into an Italian university runs through fixed-term research posts, then a six-year tenure track, then a permanent professorship.</p>
+        <div class="ladder">
+          The usual sequence
+          <ol>
+            <li>Incarico di ricerca, with a master's degree</li>
+            <li>Incarico post-doc or contratto di ricerca, with a PhD</li>
+            <li>RTT, the tenure track</li>
+            <li>Professore associato, then professore ordinario</li>
+          </ol>
+        </div>
+
+        <div class="types">
+          <article class="type" id="incarico-ricerca">
+            <h3>Incarico di ricerca <span class="en">research assignment</span></h3>
+            <p class="what">An entry-level post for recent graduates who want to try research, usually on a funded project. It is a collaboration contract, not employment.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>Holders of a laurea magistrale (or equivalent master's) obtained no more than 6 years before the deadline. No PhD needed.</dd>
+              <dt>Length</dt><dd>1 to 3 years, at most 3 years in total per person.</dd>
+              <dt>Contract</dt><dd>Parasubordinato (collaboration), exempt from income tax, with INPS contributions. Minimum pay set by ministerial decree.</dd>
+              <dt>Not open to</dt><dd>Permanent university staff, past RTT or RTD holders, and students enrolled in a degree or PhD.</dd>
+              <dt>Legal basis</dt><dd>Art. 22-ter, L. 240/2010, added by DL 45/2025.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="incarico-postdoc">
+            <h3>Incarico post-doc <span class="en">post-doctoral position</span></h3>
+            <p class="what">A short post-doc for early-career researchers, focused on research with limited teaching.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>PhD holders (or medical specialists) by the deadline. No minimum or maximum time since the PhD. Public research bodies may accept a strong CV in place of the PhD.</dd>
+              <dt>Length</dt><dd>1 to 3 years, at most 3 years in total per person.</dd>
+              <dt>Contract</dt><dd>Fixed-term employment. Pay at least that of a starting part-time university researcher.</dd>
+              <dt>Not open to</dt><dd>Permanent university staff, past RTT or RTD holders, and enrolled PhD students.</dd>
+              <dt>Legal basis</dt><dd>Art. 22-bis, L. 240/2010, added by DL 45/2025.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="contratto-ricerca">
+            <h3>Contratto di ricerca <span class="en">research contract</span></h3>
+            <p class="what">A longer post-doctoral job tied to a specific research project, the main replacement for the old assegno di ricerca.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>PhD holders (or medical specialists). Some universities also admit final-year PhD students who finish within 6 months.</dd>
+              <dt>Length</dt><dd>2 years, renewable for 2 more; up to 1 extra year on funded projects. At most 5 years in total per person.</dd>
+              <dt>Contract</dt><dd>Fixed-term employment, paid between a part-time and a full-time university researcher's salary.</dd>
+              <dt>Not open to</dt><dd>Permanent university staff and past RTT or RTD holders.</dd>
+              <dt>Legal basis</dt><dd>Art. 22, L. 240/2010, as rewritten by DL 36/2022.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="rtt">
+            <h3>RTT <span class="en">tenure-track researcher</span></h3>
+            <p class="what">The Italian tenure track. A six-year post with research and teaching duties; with the ASN and a positive evaluation, it converts into a permanent associate professorship.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>PhD holders (or medical specialists). No minimum experience. Foreign PhDs need Italian recognition (equivalenza), which can be requested by the deadline and must arrive before hiring.</dd>
+              <dt>Reserved calls</dt><dd>Some calls (art. 24 c. 1-bis) are reserved for candidates with at least 36 months of PhD or research at institutions other than the hiring one. Time abroad counts.</dd>
+              <dt>Length</dt><dd>6 years, not renewable. Can be shortened for candidates with long prior contracts.</dd>
+              <dt>Leads to</dt><dd>Professore associato, from the third year on, with the ASN and a positive evaluation.</dd>
+              <dt>Not open to</dt><dd>Current or former permanent professors and researchers, and anyone who already spent 3 years as RTT.</dd>
+              <dt>Legal basis</dt><dd>Art. 24, L. 240/2010, as rewritten by DL 36/2022.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="associato">
+            <h3>Professore associato <span class="en">associate professor</span></h3>
+            <p class="what">A permanent professorship, the second of the two professor ranks ("seconda fascia").</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>Holders of the ASN for the sector at associate or full level, current associate or full professors, or scholars holding an equivalent post abroad, per the ministry's correspondence tables.</dd>
+              <dt>Length</dt><dd>Permanent.</dd>
+              <dt>Legal basis</dt><dd>Art. 18, L. 240/2010. Universities can also hire directly scholars with 3 or more years in an equivalent post abroad (chiamata diretta); those hires don't appear on bandi.mur.gov.it.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="ordinario">
+            <h3>Professore ordinario <span class="en">full professor</span></h3>
+            <p class="what">The highest academic rank ("prima fascia"), permanent.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>Holders of the ASN for the sector at full level, current full professors, or scholars holding an equivalent full professorship abroad.</dd>
+              <dt>Length</dt><dd>Permanent.</dd>
+              <dt>Legal basis</dt><dd>Art. 18, L. 240/2010.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="tecnologo">
+            <h3>Tecnologo <span class="en">research technologist</span></h3>
+            <p class="what">A research-support post: running labs, infrastructure, data or project management, rather than leading research.</p>
+            <dl class="facts">
+              <dt>Who can apply</dt><dd>Set by each call, typically a degree plus relevant experience.</dd>
+              <dt>Contract</dt><dd>Fixed-term employment; length set by each call.</dd>
+              <dt>Legal basis</dt><dd>Art. 24-bis, L. 240/2010.</dd>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="legacy" aria-labelledby="legacy">
+        <h2 id="legacy">Legacy positions</h2>
+        <p class="section-lede">DL 36/2022 abolished these for new hires. You'll still see them in CVs, in older calls, and in a few calls finishing under transitional rules. Past time in them can matter for new applications.</p>
+        <div class="types">
+          <article class="type" id="assegno">
+            <h3>Assegno di ricerca <span class="en">research grant</span></h3>
+            <p class="what">The standard Italian post-doc before 2022: a research grant, not an employment contract, with limited social security.</p>
+            <dl class="facts">
+              <dt>Replaced by</dt><dd>Contratti di ricerca (2022), then also incarichi post-doc and di ricerca (2025).</dd>
+              <dt>Length</dt><dd>1 to 3 years, renewable, up to 6 years in total.</dd>
+              <dt>Today</dt><dd>No new calls. Whether past assegni count toward the new 11-year cap is not settled.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="rtda">
+            <h3>RTDa <span class="en">junior fixed-term researcher, type A</span></h3>
+            <p class="what">A fixed-term researcher post with no route to tenure, often funded by projects. A PNRR-funded variant ran during the recovery-plan years.</p>
+            <dl class="facts">
+              <dt>Replaced by</dt><dd>RTT (2022).</dd>
+              <dt>Length</dt><dd>3 years, extendable by 2.</dd>
+              <dt>Today</dt><dd>Only stray calls remain. Having held an RTDa excludes you from the new pre-tenure contracts, but not from RTT.</dd>
+            </dl>
+          </article>
+
+          <article class="type" id="rtdb">
+            <h3>RTDb <span class="en">senior fixed-term researcher, type B</span></h3>
+            <p class="what">The pre-2022 tenure track: a three-year post that became an associate professorship with the ASN. It required prior experience, such as a completed RTDa or 3 years of assegni.</p>
+            <dl class="facts">
+              <dt>Replaced by</dt><dd>RTT (2022).</dd>
+              <dt>Length</dt><dd>3 years, not renewable.</dd>
+              <dt>Today</dt><dd>No new calls. Its experience requirement survives, loosely, in reserved RTT calls.</dd>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="terms">
+        <h2 id="terms">Terms and rules</h2>
+        <div class="terms">
+          <details class="term">
+            <summary>What are GSD, SSD and the area codes?</summary>
+            <p>Italian academia sorts every post into a discipline. Since 2024 the main unit is the GSD (gruppo scientifico-disciplinare), e.g. 13/ECON-04 Economia applicata. Each GSD sits in one of 14 broad areas (13 is economics and statistics) and contains narrower SSDs (settori scientifico-disciplinari), e.g. ECON-04/A. Older calls use the pre-2024 settori concorsuali, such as 13/A1.</p>
+          </details>
+          <details class="term">
+            <summary>What is the ASN?</summary>
+            <p>The Abilitazione Scientifica Nazionale is a national qualification, granted per sector and per rank (associate or full), that makes you eligible for professor calls. It is a qualification, not a job. Candidates trained abroad can apply for it too.</p>
+          </details>
+          <details class="term">
+            <summary>Is there a limit on how long I can stay on fixed-term contracts?</summary>
+            <p>Yes. Each type has its own cap (3 years for incarichi, 5 for contratti), and the total across contratti, incarichi, RTT and RTD posts is 11 years, at any Italian institution. Parental and sick leave don't count. Grants such as borse di ricerca, and posts abroad, are not on the list. Universities may read these rules differently, so check with the university if you're close to a limit.</p>
+          </details>
+          <details class="term">
+            <summary>I have a PhD from outside Italy. Can I apply?</summary>
+            <p>Yes, to every position type. For incarichi and contratti, the selection committee judges whether your PhD is equivalent. For RTT, you need formal Italian recognition (equivalenza): request it before the call deadline, since it must arrive before you can be hired, and it can take months.</p>
+          </details>
+          <details class="term">
+            <summary>Do I need to be an Italian or EU citizen, or speak Italian?</summary>
+            <p>No position type requires Italian or EU citizenship. Non-EU researchers get a research permit through a hosting agreement filed by the university, which needs about 90 days. Italian is not required by law, but some calls ask for it or hold the interview in Italian.</p>
+          </details>
+          <details class="term">
+            <summary>Where does the data come from?</summary>
+            <p>From <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, the ministry's portal where universities and research bodies publish their calls, scraped daily. Eligibility is checked only against national rules, never against individual calls, and kinship exclusions are not checked.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    Sources: L. 240/2010 as amended by DL 36/2022 (L. 79/2022) and DL 45/2025 (L. 79/2025), and university regulations. <a href="./">Back to open calls</a>.
+  </footer>
+</div>
+</body>
+</html>

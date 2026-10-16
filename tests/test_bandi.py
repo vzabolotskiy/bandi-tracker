@@ -178,3 +178,26 @@ def test_export_open(tmp_path):
     assert [c["id"] for c in out["calls"]] == ["a:3", "a:1"]
     assert "raw" not in out["calls"][1] and "ssd" not in out["calls"][0]
     assert out["calls"][1]["summary_en"].endswith("…") and len(out["calls"][1]["summary_en"]) <= 701
+
+
+def test_feeds(tmp_path):
+    import xml.etree.ElementTree as ET
+    from datetime import datetime, timezone
+    from scraper.feeds import write_feeds
+    now = datetime(2026, 10, 16, 12, tzinfo=timezone.utc)
+    calls = [
+        {"id": "rtd:1", "type": "rtt", "area": "13", "gsd": "13/ECON-04", "gsd_label": "ECONOMIA APPLICATA",
+         "title": "RTT <econ> & stats", "institution": "Univ. X", "city": "BOLOGNA", "deadline": "2026-11-01T12:00",
+         "first_seen": "2026-10-15T05:00:00+00:00", "url": "https://bandi.mur.gov.it/x", "call_url": "https://u.it/c"},
+        {"id": "postdoc:2", "type": "incarico_postdoc", "area": "14", "title": "Old", "institution": "Univ. Y",
+         "first_seen": "2026-08-01T05:00:00+00:00", "url": "https://bandi.mur.gov.it/y"},
+    ]
+    names = write_feeds(calls, tmp_path, now)
+    assert len(names) == 1 + 14 + 14 * 6 + 6
+    root = ET.parse(tmp_path / "13-rtt.xml").getroot()
+    items = root.findall("./channel/item")
+    assert len(items) == 1
+    assert items[0].find("title").text == "RTT: RTT <econ> & stats (Univ. X)"
+    assert items[0].find("link").text == "https://u.it/c"
+    assert len(ET.parse(tmp_path / "all.xml").getroot().findall("./channel/item")) == 1  # old call outside 30 days
+    assert ET.parse(tmp_path / "14-postdoc.xml").getroot().findall("./channel/item") == []
