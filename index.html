@@ -55,8 +55,6 @@ header.top { padding: 40px 0 28px; }
 h1.headline { font-size: clamp(30px, 4.6vw, 52px); line-height: 1.05; font-weight: 700; margin: 0; max-width: 18ch; letter-spacing: -0.01em; }
 h1.headline .count { font-variant-numeric: tabular-nums; }
 .subline { color: var(--muted); margin: 12px 0 0; max-width: 62ch; }
-.caution { margin: 16px 0 0; max-width: 72ch; font-size: 14px; padding: 10px 14px; border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 6px 6px 0; }
-.caution strong { color: var(--ink); }
 .hint.warn { color: var(--flag); }
 
 .layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 64px; }
@@ -184,7 +182,6 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
     <p class="brand"><b>Bandi tracker</b>, open research calls in Italy. <a href="faq.html">Position types explained</a></p>
     <h1 class="headline" id="headline">Loading open calls…</h1>
     <p class="subline" id="subline"></p>
-    <p class="caution"><strong>Use this as a starting point, not a verdict.</strong> The data is scraped automatically and the eligibility rules are a simplified reading of the law, so both can be wrong or out of date. Calls can add their own requirements. Always read the call itself before applying or ruling one out.</p>
   </header>
 
   <div class="layout">
@@ -261,7 +258,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
   </div>
 
   <footer>
-    Data from <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, refreshed daily. Eligibility follows the national rules (L. 240/2010 as amended by DL 36/2022 and DL 45/2025); individual calls can add requirements, so always read the call itself. Kinship exclusions are not checked. <a href="faq.html">What the position types mean</a>.
+    Data from <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, refreshed daily. Use this as a starting point, not a verdict: the data is scraped automatically and the eligibility rules are a simplified reading of national law (L. 240/2010 as amended by DL 36/2022 and DL 45/2025), so both can be wrong or out of date. Calls can add their own requirements, and kinship exclusions are not checked, so always read the call itself before applying or ruling one out. <a href="faq.html">What the position types mean</a>.
   </footer>
 </div>
 
