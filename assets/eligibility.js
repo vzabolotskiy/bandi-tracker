@@ -121,7 +121,6 @@ export function verdict(call, p, today = new Date()) {
   if (t === "incarico_ricerca") {
     if (!lm) reasons.push("Requires a master's degree (laurea magistrale)");
     else if (monthsBetween(lm, deadline) > 72) reasons.push("Master's degree must be at most 6 years old");
-    if (p.enrolled) reasons.push("Not open to students enrolled in a degree or PhD");
     capCheck("incarichi", 36, 12, "incarichi di ricerca");
     if (foreignDegree) notes.push("Foreign degree: the committee assesses equivalence");
   } else if (t === "incarico_postdoc") {
@@ -129,7 +128,6 @@ export function verdict(call, p, today = new Date()) {
       if (EPR_RE.test(call.institution || "")) flags.push("Research body: a strong CV may substitute for the PhD");
       else needPhd();
     }
-    if (p.enrolled) reasons.push("Not open to students enrolled in a degree or PhD");
     capCheck("postdoc", 36, 12, "incarichi post-doc");
     if (foreignDegree) notes.push("Foreign PhD: the committee assesses equivalence");
   } else if (t === "contratto_ricerca") {

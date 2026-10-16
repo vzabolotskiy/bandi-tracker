@@ -72,3 +72,7 @@ test("experience note never changes status", () => {
   assert.equal(v.status, "yes");
   assert.match(v.notes[0], /over 10/);
 });
+test("PhD enrolment never blocks an application", () => {
+  const student = { ...base, lmDate: "2023-07", phd: "expected", phdDate: "2027-10", enrolled: true };
+  assert.equal(verdict(call("incarico_ricerca"), student).status, "yes");
+});
