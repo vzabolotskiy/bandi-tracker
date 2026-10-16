@@ -316,9 +316,36 @@ def run(out_path: Path, sources: list[Source], dry_run: bool = False, max_detail
     if not dry_run:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(db, ensure_ascii=False, indent=1, sort_keys=True))
+        export_open(db, out_path.parent / "open.json")
     n_open = sum(c["status"] == "open" for c in calls.values())
     log.info("done: %d open, %d new, %d total stored", n_open, len(new_ids), len(calls))
     return db
+
+
+EXPORT_FIELDS = [
+    "id", "source", "type", "url", "title", "title_en", "institution", "department", "city", "n_posts",
+    "gsd", "gsd_label", "area", "ssd", "target_group", "languages", "salary_annual", "currency", "duration_months_max",
+    "published", "deadline", "first_seen", "summary_en", "summary_it", "call_url", "apply_url",
+]
+
+
+def _trim(s: str | None, n: int = 700) -> str | None:
+    if not s or len(s) <= n:
+        return s
+    return s[:n].rsplit(" ", 1)[0] + "…"
+
+
+def export_open(db: dict, path: Path) -> None:
+    """Slim file for the website: open calls only, no raw tables, trimmed summaries."""
+    rows = []
+    for c in db["calls"].values():
+        if c.get("status") != "open":
+            continue
+        r = {k: c.get(k) for k in EXPORT_FIELDS}
+        r["summary_en"], r["summary_it"] = _trim(r["summary_en"]), _trim(r["summary_it"])
+        rows.append({k: v for k, v in r.items() if v not in (None, "", [])})
+    rows.sort(key=lambda r: r.get("deadline") or "9999")
+    path.write_text(json.dumps({"updated": db["updated"], "calls": rows}, ensure_ascii=False, separators=(",", ":")))
 
 
 def main(argv=None):

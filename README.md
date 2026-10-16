@@ -1,6 +1,8 @@
 # bandi-tracker
 
-Daily scrape of open academic calls from [bandi.mur.gov.it](https://bandi.mur.gov.it) into `data/calls.json`.
+Daily scrape of open academic calls from [bandi.mur.gov.it](https://bandi.mur.gov.it) into `data/calls.json`, plus a static site (`index.html`) that filters them by what a candidate can apply for.
+
+Site: https://vzabolotskiy.github.io/bandi-tracker/ (GitHub Pages, main branch, root).
 
 ## Coverage
 
@@ -27,6 +29,12 @@ Doctoral calls (`doctorate.php`) are not scraped.
 `id, source, type, url, title, title_en, institution, department, city, n_posts, gsd, gsd_label, area, settore_old, ssd, research_fields, target_group, degree_required, years_experience, languages, salary_annual, currency, duration_months_max, selection_en, published, deadline, summary_it, summary_en, call_url, apply_url, status, first_seen, last_seen, raw`
 
 `raw` keeps every th/td pair from the detail page, grouped by section, so new fields can be derived later without re-scraping.
+
+## Website
+
+- `index.html` loads `data/open.json` (open calls only, written by the scraper after each run).
+- `assets/eligibility.js` encodes the national eligibility rules per position type; tests in `tests/eligibility.test.mjs` (`node --test tests/eligibility.test.mjs`).
+- The visitor's profile and filters are stored in their browser only.
 
 ## Run locally
 

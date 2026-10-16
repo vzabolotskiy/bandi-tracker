@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandi tracker</title>
+<meta name="description" content="Open research and academic calls in Italy, filtered by what you can apply for.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F6F8;
+  --surface: #FFFFFF;
+  --ink: #17222E;
+  --muted: #5A6675;
+  --rule: #DCE2E8;
+  --accent: #4E3596;      /* marca da bollo violet */
+  --accent-soft: #ECE7F7;
+  --yes: #1D7347;
+  --yes-soft: #E3F2E9;
+  --flag: #94590A;
+  --flag-soft: #FBF0DC;
+  --no: #8A949F;
+  --urgent: #B3261E;
+  --focus: #4E3596;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161C; --surface: #182029; --ink: #E6EBF0; --muted: #98A4B0; --rule: #29333E;
+    --accent: #A993EA; --accent-soft: #2A2342; --yes: #57C48D; --yes-soft: #17301F;
+    --flag: #E3A845; --flag-soft: #33270F; --no: #6E7984; --urgent: #F07A70; --focus: #A993EA;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161C; --surface: #182029; --ink: #E6EBF0; --muted: #98A4B0; --rule: #29333E;
+  --accent: #A993EA; --accent-soft: #2A2342; --yes: #57C48D; --yes-soft: #17301F;
+  --flag: #E3A845; --flag-soft: #33270F; --no: #6E7984; --urgent: #F07A70; --focus: #A993EA;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.5 "Titillium Web", system-ui, sans-serif;
+}
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+a { color: var(--accent); }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+header.top { padding: 40px 0 28px; }
+.brand { font-weight: 700; font-size: 15px; color: var(--muted); margin: 0 0 18px; }
+.brand b { color: var(--accent); }
+h1.headline { font-size: clamp(30px, 4.6vw, 52px); line-height: 1.05; font-weight: 700; margin: 0; max-width: 18ch; letter-spacing: -0.01em; }
+h1.headline .count { font-variant-numeric: tabular-nums; }
+.subline { color: var(--muted); margin: 12px 0 0; max-width: 62ch; }
+
+.layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 64px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* Profile */
+aside.profile { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+@media (max-width: 900px) { aside.profile { position: static; max-height: none; } }
+aside.profile h2 { font-size: 20px; margin: 0 0 4px; }
+.pbox > summary { list-style: none; cursor: default; }
+.pbox > summary::-webkit-details-marker { display: none; }
+.psum { display: none; font-size: 14px; color: var(--muted); }
+@media (max-width: 900px) {
+  .pbox > summary { cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .pbox > summary h2 { margin: 0; }
+  .pbox:not([open]) .psum { display: block; }
+  .pbox > summary::after { content: "Edit"; color: var(--accent); font-weight: 600; font-size: 14px; }
+  .pbox[open] > summary::after { content: "Done"; }
+  .pbox[open] > summary { margin-bottom: 4px; }
+}
+aside.profile .lede { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+fieldset { border: 0; border-top: 1px solid var(--rule); margin: 0; padding: 14px 0 6px; }
+legend { font-weight: 700; font-size: 15px; padding: 0; margin-bottom: 8px; }
+.field { display: grid; gap: 4px; margin-bottom: 12px; }
+.field > span { font-size: 14px; color: var(--muted); }
+.field input[type=month], .field input[type=text], .field select, .months input {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg);
+}
+.inline { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.months { display: grid; grid-template-columns: 1fr 72px; gap: 6px 10px; align-items: center; font-size: 14px; }
+.months label { color: var(--muted); }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; margin-bottom: 12px; }
+.hint { font-size: 13px; color: var(--muted); margin: -6px 0 12px; }
+details.more summary { cursor: pointer; font-weight: 700; font-size: 15px; padding: 12px 0 8px; border-top: 1px solid var(--rule); list-style: none; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::after { content: " +"; color: var(--muted); }
+details.more[open] summary::after { content: " –"; }
+.reset { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; font-size: 14px; margin-top: 8px; }
+
+/* Filters */
+.filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 18px; }
+.search { width: 100%; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); font-size: 17px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: none; padding: 6px 12px; cursor: pointer; font-size: 14px; }
+.seg button[aria-pressed=true] { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .seg button[aria-pressed=true] { color: #12101A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg button[aria-pressed=true] { color: #12101A; } }
+.chip { border: 1px solid var(--rule); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 14px; cursor: pointer; }
+.chip[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+.chip .n { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: 4px; font-weight: 400; }
+select.area { flex: 1 1 240px; min-width: 0; max-width: 440px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); font-size: 14px; max-width: 100%; }
+.resultline { font-size: 14px; color: var(--muted); }
+
+/* Calls */
+ol.calls { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+li.call { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 16px; padding: 16px 18px; border-top: 1px solid var(--rule); }
+li.call:first-child { border-top: 0; }
+li.call.is-no { opacity: .62; }
+.due { text-align: left; }
+.due .d { font-size: 34px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.due .u { font-size: 13px; color: var(--muted); }
+.due.urgent .d { color: var(--urgent); }
+.due .d.today { font-size: 22px; line-height: 1.2; }
+.due .date { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.main { min-width: 0; }
+main { min-width: 0; }
+.kind { font-size: 13px; font-weight: 600; color: var(--accent); }
+.new { font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 0 6px; margin-left: 6px; }
+.title { font-size: 17px; font-weight: 600; line-height: 1.3; margin: 2px 0 4px; overflow-wrap: anywhere; }
+.title a { color: inherit; text-decoration: none; }
+.title a:hover { text-decoration: underline; }
+.where { font-size: 14px; color: var(--muted); }
+.gsd { font-size: 14px; }
+.gsd code { font: 600 13px "Titillium Web", sans-serif; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; }
+.verdict { font-size: 13px; font-weight: 600; border-radius: 6px; padding: 3px 8px; white-space: nowrap; align-self: start; }
+.verdict.yes { color: var(--yes); background: var(--yes-soft); }
+.verdict.flag { color: var(--flag); background: var(--flag-soft); }
+.verdict.no { color: var(--no); background: var(--bg); }
+ul.notes { margin: 8px 0 0; padding: 0; list-style: none; font-size: 14px; display: grid; gap: 2px; }
+ul.notes li::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--muted); }
+ul.notes li.r::before { background: var(--no); }
+ul.notes li.f::before { background: var(--flag); }
+ul.notes li.n::before { background: var(--rule); border: 1px solid var(--muted); }
+details.more-info { margin-top: 8px; font-size: 14px; }
+details.more-info summary { cursor: pointer; color: var(--muted); }
+details.more-info p { margin: 8px 0; max-width: 72ch; }
+details.more-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; margin: 8px 0; }
+details.more-info dt { color: var(--muted); }
+details.more-info dd { margin: 0; }
+.links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
+@media (max-width: 560px) {
+  .wrap { padding: 0 16px; }
+  li.call { grid-template-columns: 56px minmax(0, 1fr); }
+  .verdict { grid-column: 2; justify-self: start; }
+  .due .d { font-size: 28px; }
+}
+.empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+.more-btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--rule); border-top: 0; background: var(--surface); cursor: pointer; border-radius: 0 0 10px 10px; color: var(--accent); font-weight: 600; }
+footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80ch; }
+@media (prefers-reduced-motion: no-preference) {
+  .count { transition: color .3s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="brand"><b>Bandi tracker</b>, open research calls in Italy</p>
+    <h1 class="headline" id="headline">Loading open calls…</h1>
+    <p class="subline" id="subline"></p>
+  </header>
+
+  <div class="layout">
+    <aside class="profile" aria-labelledby="ph">
+      <details class="pbox" id="pbox" open>
+      <summary><h2 id="ph">Your profile</h2><span class="psum" id="psum"></span></summary>
+      <p class="lede">Answer what applies. Calls are checked against the national rules for each position type. Nothing leaves this browser.</p>
+      <form id="profile" autocomplete="off">
+        <fieldset>
+          <legend>Degrees</legend>
+          <label class="field"><span>Master's degree (laurea magistrale or equivalent), awarded</span><input type="month" name="lmDate"></label>
+          <div class="inline">
+            <label class="field"><span>PhD</span>
+              <select name="phd"><option value="none">None</option><option value="obtained">Awarded</option><option value="expected">Expected</option></select></label>
+            <label class="field"><span>Date</span><input type="month" name="phdDate"></label>
+          </div>
+          <label class="field"><span>Highest degree awarded in</span>
+            <select name="degreeCountry"><option value="it">Italy</option><option value="eu">Another EU country</option><option value="noneu">Outside the EU</option></select></label>
+          <label class="check"><input type="checkbox" name="enrolled"> Currently enrolled in a degree or PhD</label>
+        </fieldset>
+        <fieldset>
+          <legend>Time already served in Italy</legend>
+          <p class="hint">Months on each contract type, at any Italian institution. Leave at 0 if none.</p>
+          <div class="months">
+            <label for="m-incarichi">Incarichi di ricerca</label><input id="m-incarichi" type="number" min="0" max="200" name="m.incarichi" placeholder="0">
+            <label for="m-postdoc">Incarichi post-doc</label><input id="m-postdoc" type="number" min="0" max="200" name="m.postdoc" placeholder="0">
+            <label for="m-contratti">Contratti di ricerca</label><input id="m-contratti" type="number" min="0" max="200" name="m.contratti" placeholder="0">
+            <label for="m-rtt">RTT</label><input id="m-rtt" type="number" min="0" max="200" name="m.rtt" placeholder="0">
+            <label for="m-rtd">RTDa or RTDb</label><input id="m-rtd" type="number" min="0" max="200" name="m.rtd" placeholder="0">
+          </div>
+          <p class="hint" style="margin-top:8px">Assegni, borse di ricerca and posts abroad don't count here.</p>
+          <label class="field"><span>Permanent post at an Italian university or research body</span>
+            <select name="permanent"><option value="no">No</option><option value="current">Yes, currently</option><option value="former">Previously, as professor or researcher</option></select></label>
+          <label class="field"><span>Citizenship</span>
+            <select name="citizenship"><option value="eu">EU</option><option value="noneu">Non-EU</option></select></label>
+        </fieldset>
+        <details class="more" id="profmore">
+          <summary>Professor posts</summary>
+          <label class="field"><span>ASN for associate professor, sectors (GSD codes)</span><input type="text" name="asnII" placeholder="13/ECON-04, 14/GSPS-02"></label>
+          <label class="field"><span>ASN for full professor, sectors (GSD codes)</span><input type="text" name="asnI" placeholder="13/ECON-01"></label>
+          <label class="field"><span>Current rank in Italy</span>
+            <select name="rank"><option value="">None</option><option value="associate">Associate professor</option><option value="full">Full professor</option></select></label>
+          <label class="field"><span>Current post abroad, equivalent rank</span>
+            <select name="foreignRank"><option value="">None</option><option value="assistant">Assistant professor</option><option value="associate">Associate professor</option><option value="full">Full professor</option></select></label>
+        </details>
+        <button type="button" class="reset" id="reset">Clear profile</button>
+      </form>
+      </details>
+    </aside>
+
+    <main>
+      <div class="filters">
+        <input class="search" id="q" type="search" placeholder="Search titles, topics, universities" aria-label="Search calls">
+        <div class="row" id="types" role="group" aria-label="Position type"></div>
+        <div class="row">
+          <select class="area" id="area" aria-label="Field"></select>
+          <div class="seg" role="group" aria-label="Which calls to show" id="show">
+            <button type="button" data-v="can" aria-pressed="true">Calls I can apply for</button>
+            <button type="button" data-v="all" aria-pressed="false">All open calls</button>
+          </div>
+          <div class="seg" role="group" aria-label="Sort" id="sort">
+            <button type="button" data-v="deadline" aria-pressed="true">Closing soon</button>
+            <button type="button" data-v="new" aria-pressed="false">Newest</button>
+          </div>
+        </div>
+        <div class="resultline" id="resultline" aria-live="polite"></div>
+      </div>
+      <ol class="calls" id="calls"></ol>
+      <button class="more-btn" id="more" hidden>Show more</button>
+    </main>
+  </div>
+
+  <footer>
+    Data from <a href="https://bandi.mur.gov.it">bandi.mur.gov.it</a>, refreshed daily. Eligibility follows the national rules (L. 240/2010 as amended by DL 36/2022 and DL 45/2025); individual calls can add requirements, so always read the call itself. Kinship exclusions are not checked.
+  </footer>
+</div>
+
+<script type="module">
+import { verdict, profileIsEmpty, TYPE_LABELS, TYPE_HINTS } from "./assets/eligibility.js";
+
+const AREAS = {
+  "01": "Mathematics and computer science", "02": "Physics", "03": "Chemistry", "04": "Earth sciences",
+  "05": "Biology", "06": "Medicine", "07": "Agriculture and veterinary science", "08": "Civil engineering and architecture",
+  "09": "Industrial and information engineering", "10": "Classics, philology, literature, art history",
+  "11": "History, philosophy, education, psychology", "12": "Law", "13": "Economics and statistics",
+  "14": "Political and social sciences",
+};
+const TYPE_ORDER = ["incarico_ricerca", "incarico_postdoc", "contratto_ricerca", "rtt", "rtd_a", "prof_associato", "prof_ordinario", "tecnologo"];
+const PAGE = 60;
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("bt:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("bt:" + k, JSON.stringify(v)); } catch {} },
+};
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sentence = (s) => s ? s.charAt(0) + s.slice(1).toLowerCase() : "";
+const fmtDate = (s) => s ? new Date(s.slice(0, 10) + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
+
+let calls = [], updated = null;
+let state = {
+  q: "", types: store.get("types", []), area: store.get("area", ""), show: store.get("show", "can"),
+  sort: "deadline", limit: PAGE,
+};
+let profile = store.get("profile", {});
+const lastVisit = store.get("lastVisit", null);
+
+/* ---------- profile form ---------- */
+const form = $("#profile");
+function fillForm() {
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    const v = el.name.startsWith("m.") ? profile.months?.[el.name.slice(2)] : profile[el.name];
+    if (el.type === "checkbox") el.checked = !!v;
+    else if (v !== undefined && v !== null) el.value = v;
+  }
+  if (profile.asnII || profile.asnI || profile.rank || profile.foreignRank) $("#profmore").open = true;
+}
+function readForm() {
+  const p = { months: {} };
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    const v = el.type === "checkbox" ? el.checked : el.value;
+    if (el.name.startsWith("m.")) { if (v !== "") p.months[el.name.slice(2)] = Number(v); }
+    else p[el.name] = v;
+  }
+  return p;
+}
+form.addEventListener("input", () => { profile = readForm(); store.set("profile", profile); state.limit = PAGE; render(); });
+$("#reset").addEventListener("click", () => { profile = {}; store.set("profile", profile); form.reset(); render(); });
+
+/* ---------- filters ---------- */
+function segment(id, key) {
+  const el = $(id);
+  const sync = () => el.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state[key])));
+  el.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    state[key] = b.dataset.v; state.limit = PAGE; store.set(key, state[key]); sync(); render();
+  });
+  sync();
+}
+segment("#show", "show"); segment("#sort", "sort");
+let qTimer;
+$("#q").addEventListener("input", (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); state.limit = PAGE; render(); }, 120); });
+$("#area").addEventListener("change", (e) => { state.area = e.target.value; store.set("area", state.area); state.limit = PAGE; render(); });
+$("#types").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  const t = b.dataset.t, i = state.types.indexOf(t);
+  i >= 0 ? state.types.splice(i, 1) : state.types.push(t);
+  store.set("types", state.types); state.limit = PAGE; render();
+});
+$("#more").addEventListener("click", () => { state.limit += PAGE; render(); });
+
+function buildAreaSelect() {
+  const counts = {};
+  for (const c of calls) counts[c.area] = (counts[c.area] || 0) + 1;
+  const gsds = {};
+  for (const c of calls) if (c.gsd) gsds[c.gsd] = gsds[c.gsd] || { label: c.gsd_label, n: 0 }, gsds[c.gsd].n++;
+  let html = `<option value="">All fields</option>`;
+  for (const [code, name] of Object.entries(AREAS)) {
+    if (!counts[code]) continue;
+    html += `<optgroup label="${esc(name)}"><option value="${code}">All of ${esc(name.toLowerCase())} (${counts[code]})</option>`;
+    for (const [g, v] of Object.entries(gsds).filter(([g]) => g.startsWith(code + "/")).sort())
+      html += `<option value="${esc(g)}">${esc(g)} ${esc(sentence(v.label || ""))} (${v.n})</option>`;
+    html += `</optgroup>`;
+  }
+  $("#area").innerHTML = html;
+  $("#area").value = state.area;
+}
+
+/* ---------- rendering ---------- */
+function daysLeft(deadline) {
+  const d = new Date((deadline || "").slice(0, 10) + "T12:00:00");
+  const t = new Date(); t.setHours(12, 0, 0, 0);
+  return Math.round((d - t) / 86400000);
+}
+const titleCase = (s) => String(s || "").toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase());
+function matches(c) {
+  if (state.area && !(state.area.length === 2 ? c.area === state.area : c.gsd === state.area)) return false;
+  if (state.q) {
+    const hay = (c._hay ||= [c.title, c.title_en, c.institution, c.city, c.department, c.gsd, c.gsd_label, c.summary_en, c.summary_it].join(" ").toLowerCase());
+    if (!state.q.split(/\s+/).every((w) => hay.includes(w))) return false;
+  }
+  return true;
+}
+
+function render() {
+  const empty = profileIsEmpty(profile);
+  for (const c of calls) c._v = verdict(c, profile);
+  const inScope = calls.filter(matches);
+  const typeCounts = {};
+  for (const c of inScope) if (empty || state.show === "all" || c._v.status !== "no") typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
+
+  $("#types").innerHTML = TYPE_ORDER.filter((t) => typeCounts[t] || state.types.includes(t)).map((t) =>
+    `<button type="button" class="chip" data-t="${t}" aria-pressed="${state.types.includes(t)}" title="${esc(TYPE_HINTS[t] || "")}">${esc(TYPE_LABELS[t])}<span class="n">${typeCounts[t] || 0}</span></button>`).join("");
+
+  let list = inScope.filter((c) => !state.types.length || state.types.includes(c.type));
+  if (!empty && state.show === "can") list = list.filter((c) => c._v.status !== "no");
+  list.sort(state.sort === "new"
+    ? (a, b) => (b.first_seen || "").localeCompare(a.first_seen || "") || (a.deadline || "").localeCompare(b.deadline || "")
+    : (a, b) => (a.deadline || "").localeCompare(b.deadline || ""));
+
+  const canApply = calls.filter((c) => c._v.status === "yes" || c._v.status === "flag").length;
+  $("#headline").innerHTML = empty
+    ? `<span class="count">${calls.length}</span> open research calls in Italy right now`
+    : `You can apply for <span class="count">${canApply}</span> of ${calls.length} open calls`;
+  $("#subline").textContent = empty
+    ? "Fill in your profile to see which ones you can apply for. Updated " + fmtDate(updated) + "."
+    : `Across all fields and position types, under national rules. Updated ${fmtDate(updated)}.`;
+
+  const newCount = lastVisit ? list.filter((c) => c.first_seen > lastVisit).length : 0;
+  $("#resultline").textContent = `${list.length} call${list.length === 1 ? "" : "s"} shown` + (newCount ? `, ${newCount} new since your last visit` : "");
+
+  const shown = list.slice(0, state.limit);
+  $("#calls").innerHTML = shown.length ? shown.map(row).join("") :
+    `<li class="empty">${empty || state.show === "all" ? "No open calls match these filters. Try another field or clear the search." : "None of the calls matching these filters fit your profile. Switch to all open calls to see why."}</li>`;
+  $("#more").hidden = list.length <= state.limit;
+  $("#more").textContent = `Show ${Math.min(PAGE, list.length - state.limit)} more`;
+}
+
+function row(c) {
+  const v = c._v, dl = daysLeft(c.deadline);
+  const vLabel = { yes: "You can apply", flag: "You can apply, see notes", no: "Not eligible" }[v.status];
+  const isNew = lastVisit && c.first_seen > lastVisit;
+  const title = c.title_en && c.title_en.toLowerCase() !== (c.title || "").toLowerCase() ? c.title_en : c.title;
+  const items = [
+    ...v.reasons.map((x) => `<li class="r">${esc(x)}</li>`),
+    ...v.flags.map((x) => `<li class="f">${esc(x)}</li>`),
+    ...(v.notes || []).map((x) => `<li class="n">${esc(x)}</li>`),
+  ].join("");
+  const facts = [
+    ["Original title", title !== c.title ? c.title : null],
+    ["Department", c.department],
+    ["Aimed at", c.target_group],
+    ["Posts", c.n_posts > 1 ? c.n_posts : null],
+    ["Salary", c.salary_annual ? `${Math.round(c.salary_annual).toLocaleString("en-GB")} ${c.currency || "EUR"} a year` : null],
+    ["Duration", c.duration_months_max ? `up to ${c.duration_months_max} months` : null],
+    ["Sector", c.ssd],
+    ["Published", fmtDate(c.published)],
+  ].filter(([, x]) => x);
+  return `<li class="call ${v.status === "no" ? "is-no" : ""}">
+    <div class="due ${dl <= 7 ? "urgent" : ""}" aria-label="${dl === 0 ? "Closes today" : `Closes in ${dl} days`}">
+      ${dl === 0 ? `<div class="d today">Today</div><div class="u">last day</div>` : `<div class="d">${dl}</div><div class="u">${dl === 1 ? "day left" : "days left"}</div>`}
+      <div class="date">${fmtDate(c.deadline)}</div>
+    </div>
+    <div class="main">
+      <div class="kind">${esc(TYPE_LABELS[c.type] || c.type)}${isNew ? '<span class="new">New</span>' : ""}</div>
+      <div class="title"><a href="${esc(c.call_url || c.url)}" target="_blank" rel="noopener">${esc(title)}</a></div>
+      <div class="where">${esc(c.institution || "")}${c.city ? ", " + esc(titleCase(c.city)) : ""}</div>
+      ${c.gsd ? `<div class="gsd"><code>${esc(c.gsd)}</code> ${esc(sentence(c.gsd_label || ""))}</div>` : ""}
+      ${items ? `<ul class="notes">${items}</ul>` : ""}
+      <details class="more-info"><summary>Details</summary>
+        ${c.summary_en || c.summary_it ? `<p>${esc(c.summary_en || c.summary_it)}</p>` : ""}
+        ${facts.length ? `<dl>${facts.map(([k, x]) => `<dt>${esc(k)}</dt><dd>${esc(x)}</dd>`).join("")}</dl>` : ""}
+        <div class="links">
+          ${c.call_url ? `<a href="${esc(c.call_url)}" target="_blank" rel="noopener">University call page</a>` : ""}
+          ${c.apply_url && c.apply_url !== c.call_url ? `<a href="${esc(c.apply_url)}" target="_blank" rel="noopener">How to apply</a>` : ""}
+          <a href="${esc(c.url)}" target="_blank" rel="noopener">MUR listing</a>
+        </div>
+      </details>
+    </div>
+    ${v.status !== "unknown" ? `<div class="verdict ${v.status}">${vLabel}</div>` : "<div></div>"}
+  </li>`;
+}
+
+/* ---------- boot ---------- */
+fillForm();
+const narrow = matchMedia("(max-width: 900px)");
+const pbox = $("#pbox");
+function profileSummary() {
+  if (profileIsEmpty(profile)) return "Not filled in";
+  const bits = [];
+  if (profile.phd === "obtained" && profile.phdDate) bits.push("PhD " + profile.phdDate.slice(0, 4));
+  else if (profile.phd === "expected") bits.push("PhD expected");
+  else if (profile.lmDate) bits.push("Master's " + profile.lmDate.slice(0, 4));
+  if (profile.degreeCountry === "eu" || profile.degreeCountry === "noneu") bits.push("degree from abroad");
+  return bits.join(", ");
+}
+function syncPbox() {
+  $("#psum").textContent = profileSummary();
+  if (!narrow.matches) pbox.open = true;
+}
+pbox.addEventListener("toggle", () => { if (!narrow.matches && !pbox.open) pbox.open = true; });
+narrow.addEventListener("change", syncPbox);
+if (narrow.matches && !profileIsEmpty(profile)) pbox.open = false;
+syncPbox();
+form.addEventListener("input", syncPbox);
+fetch("data/open.json", { cache: "no-cache" }).then((r) => {
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}).then((d) => {
+  updated = d.updated;
+  const now = Date.now();
+  calls = d.calls.filter((c) => !c.deadline || daysLeft(c.deadline) >= 0);
+  buildAreaSelect();
+  render();
+  addEventListener("pagehide", () => store.set("lastVisit", new Date(now).toISOString()));
+}).catch((e) => {
+  $("#headline").textContent = "The call list didn't load";
+  $("#subline").textContent = "Reload the page. If it keeps failing, the daily update may be running; try again in a few minutes. (" + e.message + ")";
+});
+</script>
+</body>
+</html>

@@ -165,3 +165,16 @@ def test_num():
     assert bandi._num("30000") == 30000.0
     assert bandi._num("25,5") == 25.5
     assert bandi._num("") is None
+
+
+def test_export_open(tmp_path):
+    db = {"updated": "2026-10-16T00:00:00+00:00", "calls": {
+        "a:1": {"id": "a:1", "status": "open", "deadline": "2026-11-01", "title": "A", "raw": {"x": 1}, "summary_en": "w " * 600},
+        "a:2": {"id": "a:2", "status": "closed", "deadline": "2026-10-01", "title": "B"},
+        "a:3": {"id": "a:3", "status": "open", "deadline": "2026-10-20", "title": "C", "ssd": None},
+    }}
+    bandi.export_open(db, tmp_path / "open.json")
+    out = json.loads((tmp_path / "open.json").read_text())
+    assert [c["id"] for c in out["calls"]] == ["a:3", "a:1"]
+    assert "raw" not in out["calls"][1] and "ssd" not in out["calls"][0]
+    assert out["calls"][1]["summary_en"].endswith("…") and len(out["calls"][1]["summary_en"]) <= 701
