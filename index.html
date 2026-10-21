@@ -159,7 +159,8 @@ details.more-info p { margin: 8px 0; max-width: 72ch; }
 details.more-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; margin: 8px 0; }
 details.more-info dt { color: var(--muted); }
 details.more-info dd { margin: 0; }
-.links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
+.links .nolink { color: var(--muted); flex-basis: 100%; }
 @media (max-width: 560px) {
   .wrap { padding: 0 16px; }
   li.call { grid-template-columns: 56px minmax(0, 1fr); }
@@ -452,6 +453,13 @@ $("#calls").addEventListener("click", (e) => {
   const b = e.target.closest(".star"); if (b) toggleSaved(b.dataset.id);
 });
 
+const isUrl = (u) => /^https?:\/\/[^\s]+\.[^\s]+$/i.test(String(u || "").trim());
+const callLink = (c) => (isUrl(c.call_url) ? c.call_url.trim() : null);
+function searchLink(c) {
+  const q = [c.institution, c.ssd || c.gsd, c.type && TYPE_LABELS[c.type], "bando"].filter(Boolean).join(" ");
+  return "https://duckduckgo.com/?q=" + encodeURIComponent(q);
+}
+
 function row(c) {
   const v = c._v, dl = daysLeft(c.deadline);
   const vLabel = { yes: "You can apply", flag: "You can apply, see notes", no: "Not eligible", closed: "Closed" }[v.status];
@@ -479,7 +487,7 @@ function row(c) {
     </div>
     <div class="main">
       <div class="kind">${FAQ_ANCHOR[c.type] ? `<a class="kind-link" href="faq.html#${FAQ_ANCHOR[c.type]}" title="What is this position?">${esc(TYPE_LABELS[c.type])}</a>` : esc(TYPE_LABELS[c.type] || c.type)}${isNew ? '<span class="new">New</span>' : ""}</div>
-      <div class="title"><a href="${esc(c.call_url || c.url)}" target="_blank" rel="noopener">${esc(title)}</a></div>
+      <div class="title"><a href="${esc(callLink(c) || c.url)}" target="_blank" rel="noopener">${esc(title)}</a></div>
       <div class="where">${esc(c.institution || "")}${c.city ? ", " + esc(titleCase(c.city)) : ""}</div>
       ${c.area || c.gsd ? `<div class="gsd">${AREAS[c.area] ? `<span class="area-name">${esc(AREAS[c.area])}</span>` : ""}${c.gsd ? `<span class="spec"><code>${esc(c.gsd)}</code> ${esc(sentence(c.gsd_label || ""))}</span>` : ""}</div>` : ""}
       ${items ? `<ul class="notes">${items}</ul>` : ""}
@@ -487,9 +495,11 @@ function row(c) {
         ${c.summary_en || c.summary_it ? `<p>${esc(c.summary_en || c.summary_it)}</p>` : ""}
         ${facts.length ? `<dl>${facts.map(([k, x]) => `<dt>${esc(k)}</dt><dd>${esc(x)}</dd>`).join("")}</dl>` : ""}
         <div class="links">
-          ${c.call_url ? `<a href="${esc(c.call_url)}" target="_blank" rel="noopener">University call page</a>` : ""}
-          ${c.apply_url && c.apply_url !== c.call_url ? `<a href="${esc(c.apply_url)}" target="_blank" rel="noopener">How to apply</a>` : ""}
+          ${callLink(c) ? `<a href="${esc(callLink(c))}" target="_blank" rel="noopener">University call page</a>` : ""}
+          ${isUrl(c.apply_url) && c.apply_url !== callLink(c) ? `<a href="${esc(c.apply_url)}" target="_blank" rel="noopener">How to apply</a>` : ""}
+          ${c.apply_email ? `<span>Apply by email or PEC: <a href="mailto:${esc(c.apply_email)}">${esc(c.apply_email)}</a></span>` : ""}
           <a href="${esc(c.url)}" target="_blank" rel="noopener">MUR listing</a>
+          ${callLink(c) ? "" : `<span class="nolink">The university didn't link its call on MUR. <a href="${esc(searchLink(c))}" target="_blank" rel="noopener">Search for it</a></span>`}
         </div>
       </details>
     </div>

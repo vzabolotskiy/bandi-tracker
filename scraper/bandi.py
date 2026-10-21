@@ -67,6 +67,17 @@ ID_RE = re.compile(r"/(?:fellowship/id_fellow|job/id_job)/(\d+)")
 DATE_RE = re.compile(r"(\d{2})/(\d{2})/(\d{4})(?:\s*-\s*alle ore\s*(\d{2}):(\d{2}))?")
 GSD_RE = re.compile(r"\b(\d{2})/([A-Z]{4})-(\d{2})\b")
 OLD_SC_RE = re.compile(r"\b(\d{2}/[A-Z]\d)\b")  # pre-2024 settore concorsuale, e.g. 13/A1
+# Link fields on MUR often hold "Other", free text, an email or a bare domain instead of a URL.
+URL_RE = re.compile(
+    r"https?://[^\s,;<>\"')\]]+"
+    r"|(?<![@\w.])www\.[^\s,;<>\"')\]]+"
+    r"|(?<![@\w.\-/])[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:it|eu|org|com|net|edu)(?:/[^\s,;<>\"')\]]*)?",
+    re.I,
+)
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+# Fields searched for a link to the call, in order of preference.
+CALL_LINK_LABELS = ("sito web del bando", "commenti/sito web", "come candidarsi", "descrizione del bando",
+                    "descrizione sintetica", "processo di selezione", "criteri di selezione")
 
 
 # ---------------------------------------------------------------- fetching
@@ -216,6 +227,33 @@ def _num(v) -> float | None:
         return None
 
 
+def find_url(text: str | None) -> str | None:
+    """First real web address in free text, normalised to https://; skips emails and MUR itself."""
+    for m in URL_RE.finditer(text or ""):
+        u = m.group(0).rstrip(".:;)")
+        if "bandi.mur.gov.it" in u.lower() or "." not in u.split("//")[-1]:
+            continue
+        return u if u.lower().startswith("http") else "https://" + u
+    return None
+
+
+def extract_links(sections: dict) -> dict:
+    """call_url / apply_url / apply_email from the raw detail tables (None when absent)."""
+    def values(pred):
+        for sec in sections.values():
+            for k, v in sec.items():
+                if pred(k.lower()):
+                    yield from (v if isinstance(v, list) else [v])
+    call_url = None
+    for label in CALL_LINK_LABELS:
+        call_url = next((u for u in map(find_url, values(lambda k: k.startswith(label))) if u), None)
+        if call_url:
+            break
+    how = " ".join(values(lambda k: k.startswith("come candidarsi")))
+    email = EMAIL_RE.search(how)
+    return {"call_url": call_url, "apply_url": find_url(how), "apply_email": email.group(0).lower() if email else None}
+
+
 def normalize(listing: dict, detail: dict, source: Source, ptype: str) -> dict:
     s = detail["sections"]
     gsd_raw = _first(_find(s, "G.S.D")) or ""
@@ -260,8 +298,7 @@ def normalize(listing: dict, detail: dict, source: Source, ptype: str) -> dict:
         "deadline": listing["deadline"] or parse_date(_first(_find(s, "Data di scadenza"))),
         "summary_it": _first(_find(s, "Descrizione sintetica in italiano")),
         "summary_en": _first(_find(s, "Descrizione sintetica in inglese")),
-        "call_url": _first(_find(s, "Sito web del bando", "Commenti/sito web", "Come candidarsi")),
-        "apply_url": _first(_find(s, "Come candidarsi")),
+        **extract_links(s),
         "raw": s,
     }
 
@@ -298,6 +335,8 @@ def run(out_path: Path, sources: list[Source], dry_run: bool = False, max_detail
             if cid in calls:
                 c = calls[cid]
                 c.update(deadline=item["deadline"] or c.get("deadline"), type=ptype, status="open", last_seen=now)
+                if c.get("raw"):  # re-derive links so parser fixes reach already-stored calls
+                    c.update(extract_links(c["raw"]))
                 continue
             if max_details is not None and fetched >= max_details:
                 continue
@@ -330,7 +369,7 @@ def run(out_path: Path, sources: list[Source], dry_run: bool = False, max_detail
 EXPORT_FIELDS = [
     "id", "source", "type", "url", "title", "title_en", "institution", "department", "city", "n_posts",
     "gsd", "gsd_label", "area", "ssd", "target_group", "languages", "salary_annual", "currency", "duration_months_max",
-    "published", "deadline", "first_seen", "summary_en", "summary_it", "call_url", "apply_url",
+    "published", "deadline", "first_seen", "summary_en", "summary_it", "call_url", "apply_url", "apply_email",
 ]
 
 

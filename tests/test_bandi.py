@@ -201,3 +201,29 @@ def test_feeds(tmp_path):
     assert items[0].find("link").text == "https://u.it/c"
     assert len(ET.parse(tmp_path / "all.xml").getroot().findall("./channel/item")) == 1  # old call outside 30 days
     assert ET.parse(tmp_path / "14-postdoc.xml").getroot().findall("./channel/item") == []
+
+
+def test_find_url():
+    f = bandi.find_url
+    assert f("Other") is None and f("") is None and f(None) is None
+    assert f("https://protocollo.unipd.it/albo/viewer ") == "https://protocollo.unipd.it/albo/viewer"
+    assert f("https://www.urp.cnr.it, https://selezioni.cnr.it") == "https://www.urp.cnr.it"
+    assert f("www.unife.it/concorsi") == "https://www.unife.it/concorsi"
+    assert f("unibocconi.eu/jobmarket") == "https://unibocconi.eu/jobmarket"
+    assert f("come da bando (https://xup-phys.cloud/)") == "https://xup-phys.cloud/"
+    assert f("Information can be downloaded from: https://www.unior.it/it/ateneo/bandi-e-concorsi") == "https://www.unior.it/it/ateneo/bandi-e-concorsi"
+    assert f("pec@cert.unipa.it") is None
+    assert f("see https://bandi.mur.gov.it/x") is None
+
+
+def test_extract_links_falls_back_to_description():
+    # shape of rtd:153304 (L'Orientale): link fields say "Other", URL only in the call description
+    raw = {"Descrizione posizione": {
+               "Commenti/sito web per dettagli aggiuntivi sull'impiego (in italiano)": "Other",
+               "Descrizione del bando in inglese": "Information can be downloaded from: https://www.unior.it/it/ateneo/bandi-e-concorsi"},
+           "Dettagli per la candidatura": {"Come candidarsi": "Other"},
+           "Contatto": {"E-mail": "UFFICIO.PERSONALEDOCENTE@UNIOR.IT"}}
+    assert bandi.extract_links(raw) == {"call_url": "https://www.unior.it/it/ateneo/bandi-e-concorsi", "apply_url": None, "apply_email": None}
+    raw2 = {"D": {"Come candidarsi": "Domanda via PEC a concorsi@cert.uniroma1.it"}}
+    assert bandi.extract_links(raw2) == {"call_url": None, "apply_url": None, "apply_email": "concorsi@cert.uniroma1.it"}
+    assert bandi.extract_links({}) == {"call_url": None, "apply_url": None, "apply_email": None}
