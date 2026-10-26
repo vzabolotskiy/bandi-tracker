@@ -135,7 +135,10 @@ def parse_listing(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "lxml")
     box = soup.find(id="hiddenresult")
     if box is None:
-        return []
+        if re.search(r"trovati\s+0\s+bandi", soup.get_text(" "), re.I):
+            return []
+        title = clean(soup.title.get_text()) if soup.title else "no title"
+        raise ValueError(f"no result list on page ({title[:80]})")
     out = []
     for p in box.find_all("p"):
         a = p.find("a", href=ID_RE)
@@ -316,19 +319,47 @@ def scrape_source(f: Fetcher, src: Source) -> dict[str, tuple[dict, str]]:
     return items
 
 
+MIN_OPEN_FOR_EMPTY_CHECK = 10  # an empty listing for a source that had this many open calls = failure
+
+
+def migrate(db: dict) -> None:
+    """Schema 2: per-source status. Also undoes the old bug where a failed run closed every call:
+    calls seen on the last day any scrape succeeded, with deadlines still ahead, are reopened."""
+    if db.get("schema", 1) >= 2:
+        return
+    calls = db.get("calls", {})
+    last_day = max(((c.get("last_seen") or "")[:10] for c in calls.values()), default="")
+    today = datetime.now(timezone.utc).date().isoformat()
+    for c in calls.values():
+        if (c.get("last_seen") or "")[:10] == last_day and (c.get("deadline") or "9999")[:10] >= today:
+            c["status"] = "open"
+    last_ok = max((c.get("last_seen") or "" for c in calls.values()), default="")  # all sources run together
+    db["source_status"] = {k: {"last_ok": last_ok} for k in {c["source"] for c in calls.values()}}
+    db["schema"] = 2
+
+
 def run(out_path: Path, sources: list[Source], dry_run: bool = False, max_details: int | None = None) -> dict:
     db = json.loads(out_path.read_text()) if out_path.exists() else {"calls": {}}
     calls: dict = db["calls"]
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     f = Fetcher()
     seen, new_ids, fetched = set(), [], 0
+    migrate(db)
+    status = db.setdefault("source_status", {})
+    ok_sources: set[str] = set()
 
     for src in sources:
         try:
             open_items = scrape_source(f, src)
-        except Exception as e:  # one broken sub-site shouldn't kill the run
+            prev_open = sum(1 for c in calls.values() if c["source"] == src.key and c.get("status") == "open")
+            if not open_items and prev_open >= MIN_OPEN_FOR_EMPTY_CHECK:
+                raise ValueError(f"listing came back empty but {prev_open} calls were open last time")
+        except Exception as e:  # one broken sub-site shouldn't kill the run, nor close its calls
             log.error("source %s failed: %s", src.key, e)
+            status[src.key] = {**status.get(src.key, {}), "error": str(e)[:300], "last_fail": now}
             continue
+        ok_sources.add(src.key)
+        status[src.key] = {"last_ok": now}
         for lid, (item, ptype) in open_items.items():
             cid = f"{src.key}:{lid}"
             seen.add(cid)
@@ -351,10 +382,11 @@ def run(out_path: Path, sources: list[Source], dry_run: bool = False, max_detail
             calls[cid] = rec
             new_ids.append(cid)
 
-    scraped_sources = {s.key for s in sources}
     for cid, c in calls.items():
-        if c["source"] in scraped_sources and cid not in seen and c.get("status") == "open":
+        if c["source"] in ok_sources and cid not in seen and c.get("status") == "open":
             c["status"] = "closed"
+    if sources and not ok_sources:
+        log.error("every source failed: keeping the last known open calls")
 
     db.update(updated=now, new_this_run=new_ids)
     if not dry_run:
@@ -382,14 +414,20 @@ def _trim(s: str | None, n: int = 700) -> str | None:
 def export_open(db: dict, path: Path) -> None:
     """Slim file for the website: open calls only, no raw tables, trimmed summaries."""
     rows = []
+    today = datetime.now(timezone.utc).date().isoformat()
     for c in db["calls"].values():
-        if c.get("status") != "open":
+        if c.get("status") != "open" or (c.get("deadline") or "9999")[:10] < today:
             continue
         r = {k: c.get(k) for k in EXPORT_FIELDS}
         r["summary_en"], r["summary_it"] = _trim(r["summary_en"]), _trim(r["summary_it"])
         rows.append({k: v for k, v in r.items() if v not in (None, "", [])})
     rows.sort(key=lambda r: r.get("deadline") or "9999")
-    path.write_text(json.dumps({"updated": db["updated"], "calls": rows}, ensure_ascii=False, separators=(",", ":")))
+    oks = [v.get("last_ok") for v in db.get("source_status", {}).values() if v.get("last_ok")]
+    failing = sorted(k for k, v in db.get("source_status", {}).items() if v.get("last_fail", "") >= v.get("last_ok", "") and v.get("last_fail"))
+    st = db.get("source_status", {})
+    last_ok = min((st[k].get("last_ok") or "" for k in failing), default=None) if failing else max(oks, default=None)
+    meta = {"updated": db.get("updated"), "last_ok": last_ok or None, "failing": failing}
+    path.write_text(json.dumps({**meta, "calls": rows}, ensure_ascii=False, separators=(",", ":")))
     write_feeds(rows, path.parent / "feeds")
 
 

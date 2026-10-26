@@ -169,9 +169,9 @@ def test_num():
 
 def test_export_open(tmp_path):
     db = {"updated": "2026-10-16T00:00:00+00:00", "calls": {
-        "a:1": {"id": "a:1", "status": "open", "deadline": "2026-11-01", "title": "A", "raw": {"x": 1}, "summary_en": "w " * 600},
+        "a:1": {"id": "a:1", "status": "open", "deadline": "2099-11-01", "title": "A", "raw": {"x": 1}, "summary_en": "w " * 600},
         "a:2": {"id": "a:2", "status": "closed", "deadline": "2026-10-01", "title": "B"},
-        "a:3": {"id": "a:3", "status": "open", "deadline": "2026-10-20", "title": "C", "ssd": None},
+        "a:3": {"id": "a:3", "status": "open", "deadline": "2099-10-20", "title": "C", "ssd": None},
     }}
     bandi.export_open(db, tmp_path / "open.json")
     out = json.loads((tmp_path / "open.json").read_text())
@@ -227,3 +227,58 @@ def test_extract_links_falls_back_to_description():
     raw2 = {"D": {"Come candidarsi": "Domanda via PEC a concorsi@cert.uniroma1.it"}}
     assert bandi.extract_links(raw2) == {"call_url": None, "apply_url": None, "apply_email": "concorsi@cert.uniroma1.it"}
     assert bandi.extract_links({}) == {"call_url": None, "apply_url": None, "apply_email": None}
+
+
+ERROR_PAGE = "<html><head><title>ERROR: The request could not be satisfied</title></head><body>403 ERROR</body></html>"
+
+
+def test_parse_listing_rejects_error_pages():
+    with pytest.raises(ValueError):
+        parse_listing(ERROR_PAGE)
+    assert parse_listing("<html><body><h2>Risultato della ricerca bandi - trovati 0 bandi</h2></body></html>") == []
+
+
+def _seed(tmp_path, monkeypatch):
+    monkeypatch.setattr(bandi, "Fetcher", lambda: FakeFetcher())
+    out = tmp_path / "calls.json"
+    bandi.run(out, [SRC["postdoc"], SRC["rtd"]])
+    return out
+
+
+def test_outage_keeps_calls_open(tmp_path, monkeypatch):
+    out = _seed(tmp_path, monkeypatch)
+
+    class Down(FakeFetcher):
+        def get(self, path, params=None):
+            return ERROR_PAGE
+    monkeypatch.setattr(bandi, "Fetcher", lambda: Down())
+    db = bandi.run(out, [SRC["postdoc"], SRC["rtd"]])
+    assert all(c["status"] == "open" for c in db["calls"].values())
+    assert db["source_status"]["postdoc"]["error"].startswith("no result list")
+    exported = json.loads((tmp_path / "open.json").read_text())
+    assert exported["failing"] == ["postdoc", "rtd"] and exported["last_ok"]
+
+
+def test_empty_listing_with_many_open_is_a_failure(tmp_path, monkeypatch):
+    out = tmp_path / "calls.json"
+    db = {"schema": 2, "calls": {f"postdoc:{i}": {"id": f"postdoc:{i}", "source": "postdoc", "status": "open", "deadline": "2099-01-01"} for i in range(12)}}
+    out.write_text(json.dumps(db))
+
+    class Empty(FakeFetcher):
+        def get(self, path, params=None):
+            return "<div id='hiddenresult'></div>"
+    monkeypatch.setattr(bandi, "Fetcher", lambda: Empty())
+    db = bandi.run(out, [SRC["postdoc"]])
+    assert sum(c["status"] == "open" for c in db["calls"].values()) == 12
+
+
+def test_migrate_reopens_calls_closed_by_outage():
+    db = {"calls": {
+        "a": {"source": "postdoc", "status": "closed", "last_seen": "2026-10-21T10:00:00+00:00", "deadline": "2099-01-01"},
+        "b": {"source": "postdoc", "status": "closed", "last_seen": "2026-10-21T10:00:00+00:00", "deadline": "2020-01-01"},
+        "c": {"source": "rtd", "status": "closed", "last_seen": "2026-10-15T10:00:00+00:00", "deadline": "2099-01-01"},
+    }}
+    bandi.migrate(db)
+    assert [db["calls"][k]["status"] for k in "abc"] == ["open", "closed", "closed"]
+    assert db["schema"] == 2 and db["source_status"]["rtd"]["last_ok"].startswith("2026-10-21")
+    bandi.migrate(db)  # idempotent

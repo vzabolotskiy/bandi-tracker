@@ -55,6 +55,7 @@ header.top { padding: 40px 0 28px; }
 h1.headline { font-size: clamp(30px, 4.6vw, 52px); line-height: 1.05; font-weight: 700; margin: 0; max-width: 18ch; letter-spacing: -0.01em; }
 h1.headline .count { font-variant-numeric: tabular-nums; }
 .subline { color: var(--muted); margin: 12px 0 0; max-width: 62ch; }
+.stale { margin: 14px 0 0; max-width: 70ch; font-size: 15px; padding: 8px 12px; border-left: 3px solid var(--flag); color: var(--ink); }
 .hint.warn { color: var(--flag); }
 
 .layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 64px; }
@@ -183,6 +184,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
     <p class="brand"><b>Bandi tracker</b>, open research calls in Italy. <a href="faq.html">Position types explained</a></p>
     <h1 class="headline" id="headline">Loading open calls…</h1>
     <p class="subline" id="subline"></p>
+    <p class="stale" id="stale" role="status" hidden></p>
   </header>
 
   <div class="layout">
@@ -291,7 +293,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const sentence = (s) => s ? s.charAt(0) + s.slice(1).toLowerCase() : "";
 const fmtDate = (s) => s ? new Date(s.slice(0, 10) + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
 
-let calls = [], updated = null;
+let calls = [], updated = null, lastOk = null, failing = [];
 let state = {
   q: "", types: store.get("types", []), area: store.get("area", ""), show: store.get("show", "can"),
   sort: "deadline", limit: PAGE,
@@ -413,8 +415,11 @@ function render() {
     ? `<span class="count">${calls.length}</span> open research calls in Italy right now`
     : `You can apply for <span class="count">${canApply}</span> of ${calls.length} open calls`;
   $("#subline").textContent = empty
-    ? "Fill in your profile to see which ones you can apply for. Updated " + fmtDate(updated) + "."
-    : `Across all fields and position types, under national rules. Updated ${fmtDate(updated)}.`;
+    ? "Fill in your profile to see which ones you can apply for. Updated " + fmtDate(lastOk || updated) + "."
+    : `Across all fields and position types, under national rules. Updated ${fmtDate(lastOk || updated)}.`;
+  const stale = failing.length && lastOk;
+  $("#stale").hidden = !stale;
+  if (stale) $("#stale").textContent = `bandi.mur.gov.it has not been reachable since ${fmtDate(lastOk)}. You're seeing the calls that were open then and whose deadlines haven't passed; calls published since are missing until the site is back.`;
 
   const newCount = lastVisit ? list.filter((c) => c.first_seen > lastVisit).length : 0;
   $("#resultline").textContent = state.show === "saved"
@@ -536,7 +541,7 @@ fetch("data/open.json", { cache: "no-cache" }).then((r) => {
   if (!r.ok) throw new Error(r.status);
   return r.json();
 }).then((d) => {
-  updated = d.updated;
+  updated = d.updated; lastOk = d.last_ok || null; failing = d.failing || [];
   const now = Date.now();
   calls = d.calls.filter((c) => !c.deadline || daysLeft(c.deadline) >= 0);
   buildAreaSelect();
