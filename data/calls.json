@@ -91187,39 +91187,39 @@
  "source_status": {
   "assegni": {
    "error": "giving up on /bandi.php/public/cercaFellowship",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "contratti": {
    "error": "giving up on /contrattidiricerca.php/public/cercaFellowship",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "incarichi": {
    "error": "giving up on /incarichidiricerca.php/public/cercaFellowship",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "postdoc": {
    "error": "giving up on /incarichipostdoc.php/public/cercaFellowship",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "prof": {
    "error": "giving up on /profcalls.php/public/cercaJobs",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "rtd": {
    "error": "giving up on /jobs.php/public/cercaJobs",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   },
   "tecno": {
    "error": "giving up on /tecno.php/public/cercaJobs",
-   "last_fail": "2026-10-27T10:35:28+00:00",
+   "last_fail": "2026-10-28T11:21:22+00:00",
    "last_ok": "2026-10-21T10:09:54+00:00"
   }
  },
- "updated": "2026-10-27T10:35:28+00:00"
+ "updated": "2026-10-28T11:21:22+00:00"
 }
