@@ -236,6 +236,8 @@ def test_parse_listing_rejects_error_pages():
     with pytest.raises(ValueError):
         parse_listing(ERROR_PAGE)
     assert parse_listing("<html><body><h2>Risultato della ricerca bandi - trovati 0 bandi</h2></body></html>") == []
+    # Nov 2026 redesign wording for an empty search
+    assert parse_listing("<html><body><h2>Risultato della ricerca bandi</h2><p>Non sono presenti bandi per i criteri di ricerca selezionati.</p></body></html>") == []
 
 
 def _seed(tmp_path, monkeypatch):

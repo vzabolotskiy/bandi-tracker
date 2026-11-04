@@ -74,6 +74,8 @@ URL_RE = re.compile(
     r"|(?<![@\w.\-/])[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:it|eu|org|com|net|edu)(?:/[^\s,;<>\"')\]]*)?",
     re.I,
 )
+# Legit empty search: old wording "trovati 0 bandi", Nov 2026 redesign "Non sono presenti bandi per i criteri…"
+NO_RESULTS_RE = re.compile(r"trovati\s+0\s+bandi|non sono presenti bandi", re.I)
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 # Fields searched for a link to the call, in order of preference.
 CALL_LINK_LABELS = ("sito web del bando", "commenti/sito web", "come candidarsi", "descrizione del bando",
@@ -135,7 +137,7 @@ def parse_listing(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "lxml")
     box = soup.find(id="hiddenresult")
     if box is None:
-        if re.search(r"trovati\s+0\s+bandi", soup.get_text(" "), re.I):
+        if NO_RESULTS_RE.search(soup.get_text(" ")):
             return []
         title = clean(soup.title.get_text()) if soup.title else "no title"
         raise ValueError(f"no result list on page ({title[:80]})")
