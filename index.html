@@ -230,7 +230,7 @@ footer { color: var(--muted); font-size: 13px; padding: 0 0 40px; max-width: 80c
           <label class="field"><span>Current post abroad, equivalent rank</span>
             <select name="foreignRank"><option value="">None</option><option value="assistant">Assistant professor</option><option value="associate">Associate professor</option><option value="full">Full professor</option></select></label>
         </details>
-        <button type="button" class="reset" id="reset">Clear profile</button>
+        <button type="button" class="reset" id="clearProfile">Clear profile</button>
       </form>
       </details>
     </aside>
@@ -331,7 +331,13 @@ function readForm() {
   return p;
 }
 form.addEventListener("input", () => { profile = readForm(); store.set("profile", profile); state.limit = PAGE; render(); });
-$("#reset").addEventListener("click", () => { profile = {}; store.set("profile", profile); form.reset(); render(); });
+// Not form.reset(): any form control with id/name "reset" would shadow that method.
+$("#clearProfile").addEventListener("click", () => {
+  profile = {}; store.set("profile", profile);
+  HTMLFormElement.prototype.reset.call(form);
+  if (typeof syncPbox === "function") syncPbox();
+  state.limit = PAGE; render();
+});
 
 /* ---------- filters ---------- */
 function segment(id, key) {
